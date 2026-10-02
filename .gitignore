@@ -1,0 +1,12 @@
+.swift-cache/
+dist/
+installers/*.pkg
+evidence/
+tools/__pycache__/
+.DS_Store
+Recordings/
+recordings/
+firmware/
+driver/src/
+driver/build/
+_site/
