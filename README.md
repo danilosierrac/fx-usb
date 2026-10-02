@@ -76,7 +76,7 @@ What was tried, measured and changed along the way is in [docs/engineering-log.m
 | `Sources/FeedbackGuard.swift` | Frequency shifter, howl detector with notch filters, limiter, room simulation |
 | `Sources/fxmic_reader.py` | The reader uploaded to the mic's RAM (MicroPython + viper) |
 | `driver/` | Builds and installs the FX–USB virtual microphone from BlackHole v0.7.1 |
-| `site/` | The guide page. `site/publish.sh` builds it and publishes it to the `gh-pages` branch for GitHub Pages |
+| `site/` | The guide page. `site/publish.sh` builds it and publishes it to the `gh-pages` branch for GitHub Pages; `site/make-og.sh` renders the social sharing card (`og-image.png`) |
 | `tools/` | Python diagnostics: device queries and reader comparisons |
 
 ## Diagnostics
