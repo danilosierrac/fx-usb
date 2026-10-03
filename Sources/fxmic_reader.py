@@ -108,21 +108,25 @@ def _fxu_open(chans, base):
     C.config(read=tab, write=0x5000002c + 0x40*D.channel, count=1, ctrl=C.pack_ctrl(size=2, inc_read=1, inc_write=0, ring_sel=0, ring_size=ring, treq_sel=0x3f, chain_to=C.channel, irq_quiet=1), trigger=False)
     E.config(read=0x400b0028, write=stamps, count=1, ctrl=E.pack_ctrl(size=2, inc_read=0, inc_write=1, ring_sel=1, ring_size=ring, treq_sel=0x3f, chain_to=E.channel, irq_quiet=1), trigger=False)
     return tab, stamps, count - 1
-def _fxu_wrap(orig, btn):
-    # Records button presses from the factory callback, then always runs the factory
-    # code. Uses no globals, so it stays harmless if our names are removed.
+def _fxu_wrap(orig, btn, block):
+    # Records button presses from the factory callback, then runs the factory code unless
+    # the Mac has given that button another job (bit set in block[0]). Uses no globals, so
+    # it stays harmless if our names are removed.
     def cb(m):
+        skip = False
         try:
             t = m >> 16
             v = m & 0xffff
-            if v < 3:
+            if v < 3 and (t == 1 or t == 2):
                 if t == 1:
                     btn[0] |= 1 << v
-                elif t == 2:
+                else:
                     btn[0] &= ~(1 << v)
+                skip = block[0] & (1 << v) != 0
         except Exception:
             pass
-        orig(m)
+        if not skip:
+            orig(m)
     return cb
 def _fxu_status(sp, btn):
     # 'FXS1', effect (-1 clean, 0-3), sample (0-3), buttons (1 play/bottom, 2 sample select/middle, 4 effect/orange),
@@ -136,8 +140,12 @@ def _fxu_status(sp, btn):
 def _fxu_cmd(c):
     # The Mac sends Ctrl-C (which interrupts the loop and, in MicroPython, flushes stdin),
     # then the command in a separate write: 'e' + '0'-'4' effect (clean, 1-4),
-    # 's' + '0'-'3' sample, 'p' play down, 'q' play up. Anything else (CR) stops.
+    # 's' + '0'-'3' sample, 'p' play down, 'q' play up, 'm' + '0'-'7' buttons whose mic
+    # action is off (1 play, 2 sample select, 4 effect). Anything else (CR) stops.
     g = globals()
+    if c == 109:
+        g['_fxu_mask'][0] = sys.stdin.buffer.read(1)[0] - 48
+        return True
     if c == 101:
         n = sys.stdin.buffer.read(1)[0] - 49
         g['fx_pos'] = n
@@ -168,8 +176,10 @@ def _fxu_run():
         sp = bytearray(16)
         sp[0:4] = b'FXS1'
         btn = [0]
+        global _fxu_mask
+        _fxu_mask = [0]
         if orig:
-            ui.callback(_fxu_wrap(orig, btn))
+            ui.callback(_fxu_wrap(orig, btn, _fxu_mask))
         write = sys.stdout.buffer.write
         drain = _fxu_drain
         status = _fxu_status
@@ -178,6 +188,7 @@ def _fxu_run():
         _fxu_arm(0x50000000, C.channel, D.channel, E.channel, tab, stamps)
         struct.pack_into('<6I', st, 0, 0, 0, tab, stamps, 0x50000004 + 0x40*E.channel, mask)
         last = told = ticks()
+        sent = 0
         idle = 0
         # Bytecode loop on purpose: every pass runs the VM's pending check, which keeps the
         # mic's USB task and button callbacks serviced.
@@ -192,8 +203,10 @@ def _fxu_run():
                     idle += 1
                     if idle == 1:
                         last = ticks()
-                        if diff(last, told) >= 50:
+                        # Every 50 ms, and at once when a button changes.
+                        if diff(last, told) >= 50 or btn[0] != sent:
                             told = last
+                            sent = btn[0]
                             status(sp, btn)
                             write(sp)
                     elif idle & 63 == 0 and diff(ticks(), last) > 100:

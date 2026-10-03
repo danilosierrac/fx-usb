@@ -44,8 +44,8 @@ copies every ready slot (up to 8) into one packet; the loop then writes the pack
 is deliberately bytecode: every pass lets MicroPython run its USB task and the factory button
 callbacks. A loop that never yields starves USB, and writes then block.
 
-**Status.** Every 50 ms the reader sends the effect, sample, buttons, handle position and
-accelerometer. Button presses come from a wrapper around the factory `python_callback` that records
+**Status.** Every 50 ms, and at once when a button changes, the reader sends the effect, sample,
+buttons, handle position and accelerometer. Button presses come from a wrapper around the factory `python_callback` that records
 the press and always calls the original. The wrapper uses no globals, so it stays safe if the reader
 is removed.
 
@@ -76,7 +76,9 @@ buttons (bit 0 play/bottom, bit 1 sample select/middle, bit 2 effect/orange), ha
 flags (bit 0 effect change pending, bit 1 sample change pending), 0, then accelerometer x, y, z (int16).
 
 **Commands**: `e0`–`e4` set the effect (clean, then 1–4), `s0`–`s3` set the sample, `p`/`q` press and
-release play. Each one updates the mic's own LEDs.
+release play. Each one updates the mic's own LEDs. `m0`–`m7` set which buttons skip their factory action
+(bit 0 play, 1 sample select, 2 effect), for buttons that have a job on the Mac; the wrapper still
+records their presses.
 
 ## The Mac app (`Sources/`)
 
@@ -89,6 +91,7 @@ release play. Each one updates the mic's own LEDs.
 | Call output | AUHAL plays into the hidden "FX-USB-Bridge" device, and the Mac's default input is switched to "FX–USB" (restored on quit). It falls back to BlackHole 2ch. |
 | Speakers | A second 30 ms buffer feeds any output except the bridge, through `FeedbackGuard`: a 5 Hz single-sideband frequency shift (255-tap Hilbert filter), a howl detector (2048-point FFT; a narrow peak at least 22 dB over its neighbours for 8 frames gets a notch, at most 8 notches) and a limiter. |
 | Recording | An exact 75:64 resample (56,250 to 48,000 Hz), written as a mono 16-bit WAV. |
+| Buttons | Presses come from the status packets (the handle counts as pressed above 0.15 and released below 0.06). Each control can hold an assistant's talk shortcut, record a voice note while held, tap a key combo or run a Shortcut. Key events are posted with `CGEvent`, which needs the Accessibility permission. For clean voice, it sends `e0` on press and restores the previous effect on release. Mappings live in UserDefaults, and the block mask is resent on every connect. |
 | UI | A SwiftUI window and menu bar panel from the same model, refreshed 30 times a second. The menu bar icon fills with the level. |
 
 ## The virtual microphone (`driver/`)

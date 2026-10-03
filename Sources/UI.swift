@@ -36,6 +36,8 @@ struct Snapshot: Equatable {
     var outputs: [String] = []
     var feedbackCaught = false
     var pressedSample: Int?
+    var buttonsSummary = "Not set up"
+    var notice = ""
 }
 
 final class MicModel: ObservableObject {
@@ -53,6 +55,7 @@ final class MicModel: ObservableObject {
     var setVolume: (Double) -> Void = { _ in }
     var chooseOutput: (String) -> Void = { _ in }
     var openWindow: () -> Void = {}
+    var openButtons: () -> Void = {}
     var openSoundSettings: () -> Void = {}
     var quit: () -> Void = {}
 }
@@ -96,6 +99,7 @@ struct DotMark: View {
 
 func hint(_ s: Snapshot) -> String {
     if !s.connected { return s.status.isEmpty ? "Connect FX MIC with a USB-C cable." : s.status }
+    if !s.notice.isEmpty { return s.notice }
     if s.feedbackCaught { return "Feedback caught and filtered. Lower the speakers or point the mic away." }
     if !s.bridgeInstalled { return "Install the FX–USB microphone to use it in calls." }
     if s.muted { return "Muted. Unmute to be heard." }
@@ -129,7 +133,8 @@ struct MainView: View {
             Text(hint(s)).font(helvetica(13)).foregroundColor(s.connected ? Palette.ink : Palette.quiet)
                 .frame(maxWidth:.infinity,minHeight:50,alignment:.leading).padding(.horizontal,22)
             ControlGrid(model:model,tile:(380-3)/4)
-            OutputRow(model:model).padding(.horizontal,22).padding(.vertical,12)
+            OutputRow(model:model).padding(.horizontal,22).padding(.top,12)
+            ButtonsRow(model:model).padding(.horizontal,22).padding(.top,8).padding(.bottom,14)
         }
         .frame(width:380)
         .background(Palette.paper)
@@ -148,7 +153,8 @@ struct PopoverView: View {
             Text(hint(s)).font(helvetica(12)).foregroundColor(s.connected ? Palette.ink : Palette.quiet)
                 .frame(maxWidth:.infinity,minHeight:46,alignment:.leading).padding(.horizontal,16)
             ControlGrid(model:model,tile:80)
-            OutputRow(model:model).padding(.horizontal,16).padding(.vertical,10)
+            OutputRow(model:model).padding(.horizontal,16).padding(.top,10)
+            ButtonsRow(model:model).padding(.horizontal,16).padding(.top,6).padding(.bottom,10)
             Rectangle().fill(Palette.rule).frame(height:1)
             HStack(spacing:0) {
                 FooterLink(title:"WINDOW",action:model.openWindow)
@@ -199,6 +205,19 @@ struct FooterLink: View {
 
 /// Offscreen renders (--preview) cannot draw an NSMenu, so they show a plain label instead.
 var renderingPreview = false
+
+/// What the mic's controls do on the Mac, and the way into the Buttons window.
+struct ButtonsRow: View {
+    @ObservedObject var model: MicModel
+    var body: some View {
+        HStack(spacing:10) {
+            Text("BUTTONS").font(mono).foregroundColor(Palette.quiet)
+            Text(model.snapshot.buttonsSummary).font(mono).foregroundColor(Palette.ink).lineLimit(1).truncationMode(.tail)
+            Spacer(minLength:6)
+            Button(action:model.openButtons) { Text("SET UP ›").font(mono).foregroundColor(Palette.ink) }.buttonStyle(.plain)
+        }
+    }
+}
 
 struct OutputRow: View {
     @ObservedObject var model: MicModel
@@ -528,6 +547,16 @@ final class MainWindow {
 /// Renders the window with sample states to PNGs (design review without a screen capture).
 @MainActor func renderPreviews(_ directory: String) {
     renderingPreview = true
+    let store = ButtonsStore(persist:false)
+    store[.handle] = Mapping(action:.assistant,assistant:"Claude",combo:KeyCombo(keyCode:49,flags:CGEventFlags.maskAlternate.rawValue,modifierOnly:false))
+    store[.play] = Mapping(action:.voiceNote)
+    store.trusted = true
+    store.pressed = [.handle]
+    let buttonsRenderer = ImageRenderer(content:ButtonsView(store:store))
+    buttonsRenderer.scale = 2
+    if let image = buttonsRenderer.nsImage, let tiff = image.tiffRepresentation, let rep = NSBitmapImageRep(data:tiff) {
+        try? rep.representation(using:.png,properties:[:])?.write(to:URL(fileURLWithPath:"\(directory)/buttons.png"))
+    } else { print("buttons preview: renderer returned no image") }
     try? FileManager.default.createDirectory(atPath:directory,withIntermediateDirectories:true)
     let devices = ["MacBook Pro Speakers","Studio Display Speakers","External Headphones"]
     let live = Snapshot(connected:true,status:"",level:0.45,mic:MicStatus(effect:1,sample:2,buttons:4,handle:0.6,motion:0.3),
@@ -536,6 +565,7 @@ final class MainWindow {
     let offline = Snapshot(connected:false,status:"Connect FX–MIC by USB-C and press its handle")
     for (name,snapshot) in [("live",live),("idle",idle),("offline",offline)] {
         let model = MicModel(); model.snapshot = snapshot
+        model.snapshot.buttonsSummary = "Handle → Claude · Bottom → voice note"
         for (suffix,view) in [("",AnyView(MainView(model:model))),("-menubar",AnyView(PopoverView(model:model)))] {
             let renderer = ImageRenderer(content:view)
             renderer.scale = 2

@@ -163,7 +163,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   <div class="name"><svg class="mark" viewBox="0 0 50 50" aria-hidden="true" id="mark"></svg><h1 style="font-size:inherit">FX—USB</h1></div>
   <div><small>USB audio<br>for EP—2350 FX mic</small></div>
   <div><small>User<br>guide</small></div>
-  <div class="ver"><small>Ver 0.2</small><span class="unofficial">Unofficial</span></div>
+  <div class="ver"><small>Ver 0.3</small><span class="unofficial">Unofficial</span></div>
 </header>
 
 <main>
@@ -239,7 +239,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
       </figure>
       <figure>
         <div class="card"><div class="strip">Open FX–USB</div><div class="art"><svg id="art-app" viewBox="0 0 260 230" aria-hidden="true"></svg></div></div>
-        <figcaption>Install it once with FX-USB.pkg (see chapter 7), then open FX–USB from Applications. <span class="hint">It finds the mic by itself and says LIVE.</span></figcaption>
+        <figcaption>Install it once with FX-USB.pkg (see chapter 8), then open FX–USB from Applications. <span class="hint">It finds the mic by itself and says LIVE.</span></figcaption>
       </figure>
       <figure>
         <div class="card"><div class="strip">Pick FX–USB</div><div class="art"><svg id="art-pick" viewBox="0 0 260 230" aria-hidden="true"></svg></div></div>
@@ -262,8 +262,8 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
           <defs>
             <linearGradient id="wall" x1="0" y1="0" x2="0.6" y2="1"><stop offset="0" stop-color="#A3A4A0"/><stop offset="1" stop-color="#55564F"/></linearGradient>
             <filter id="lift" x="-30%" y="-20%" width="160%" height="150%"><feDropShadow dx="0" dy="16" stdDeviation="16" flood-color="#000" flood-opacity="0.4"/></filter>
-            <clipPath id="win"><rect x="150" y="78" width="300" height="551" rx="11"/></clipPath>
-            <clipPath id="pan"><rect x="762" y="46" width="270" height="303" rx="13"/></clipPath>
+            <clipPath id="win"><rect x="150" y="70" width="300" height="570" rx="11"/></clipPath>
+            <clipPath id="pan"><rect x="762" y="46" width="270" height="319" rx="13"/></clipPath>
           </defs>
           <rect width="1200" height="760" fill="url(#wall)"/>
           <rect width="1200" height="32" fill="#141414" fill-opacity="0.9"/>
@@ -279,11 +279,11 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
           <rect x="974.5" y="12.5" width="14" height="7" rx="1.5" fill="#F2F2F0"/>
           <rect x="995.5" y="14" width="2" height="4" rx="1" fill="#F2F2F0"/>
           <text x="1176" y="21" font-size="14" text-anchor="end">Fri 2 Oct  23:41</text>
-          <g filter="url(#lift)"><image href="app-window.png" x="150" y="78" width="300" height="551" clip-path="url(#win)"/></g>
-          <circle cx="168" cy="95" r="6" fill="#FF5F57"/><circle cx="188" cy="95" r="6" fill="#FEBC2E"/><circle cx="208" cy="95" r="6" fill="#28C840"/>
+          <g filter="url(#lift)"><image href="app-window.png" x="150" y="70" width="300" height="570" clip-path="url(#win)"/></g>
+          <circle cx="168" cy="87" r="6" fill="#FF5F57"/><circle cx="188" cy="87" r="6" fill="#FEBC2E"/><circle cx="208" cy="87" r="6" fill="#28C840"/>
           <g filter="url(#lift)">
             <path d="M897 38 L888 47 H906 Z" fill="#ECECEA"/>
-            <image href="app-panel.png" x="762" y="46" width="270" height="303" clip-path="url(#pan)"/>
+            <image href="app-panel.png" x="762" y="46" width="270" height="319" clip-path="url(#pan)"/>
           </g>
           <rect x="390" y="682" width="420" height="68" rx="20" fill="#FFFFFF" fill-opacity="0.2" stroke="#FFFFFF" stroke-opacity="0.25"/>
           <g transform="translate(404 690)">
@@ -305,8 +305,34 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     </div>
   </section>
 
+  <section class="chapter wrap" aria-labelledby="cb">
+    <div class="bar"><span class="num">5</span><h2 id="cb">Buttons on your Mac</h2></div>
+    <p class="lead">Give the mic's handle and buttons a job on your Mac: talk to an assistant, record a voice note, press a shortcut. In the app, click SET UP next to BUTTONS.</p>
+    <div class="cards two">
+      <figure>
+        <div class="card"><div class="strip">The buttons window</div><div class="art" style="padding:18px"><img src="app-buttons.png" width="460" height="713" alt="FX–USB Buttons window: the handle is set to talk to Claude with the option shortcut, with clean voice on; the bottom button records a voice note"></div></div>
+        <figcaption>Pick a job for each control from the list. <span class="hint">A green light shows when you press it, and the grey line under each one says exactly what will happen.</span></figcaption>
+      </figure>
+      <div class="cards" style="align-content:start">
+        <figure>
+          <div class="card"><div class="strip">Talk to an assistant</div><div class="text"><p>Hold the handle and FX–USB holds your assistant's talk shortcut, so ChatGPT, Claude, Siri or Dictation listens. Let go and it stops.</p><p>The effects switch off while you talk, so the assistant hears your clean voice and understands you better. You can turn that off.</p></div></div>
+          <figcaption>Use the push-to-talk or dictation shortcut from your assistant's settings, then record the same keys in FX–USB.</figcaption>
+        </figure>
+        <figure>
+          <div class="card"><div class="strip">Voice notes</div><div class="text"><p>Hold a button to record, let go to save. Notes go to Music/FX–USB/Voice notes.</p></div></div>
+        </figure>
+        <figure>
+          <div class="card"><div class="strip">Shortcuts</div><div class="text"><p>Press any keyboard shortcut, or run a Shortcut from the Shortcuts app.</p></div></div>
+        </figure>
+        <figure>
+          <div class="card"><div class="strip">Good to know</div><div class="text"><p>A button with a Mac job stops doing its mic job, unless you tick "also on the mic". The handle always lets your voice through.</p><p>Pressing keys for other apps needs a one-time permission: System Settings → Privacy &amp; Security → Accessibility → FX–USB.</p></div></div>
+        </figure>
+      </div>
+    </div>
+  </section>
+
   <section class="chapter wrap" aria-labelledby="c5">
-    <div class="bar"><span class="num">5</span><h2 id="c5">What you can do</h2></div>
+    <div class="bar"><span class="num">6</span><h2 id="c5">What you can do</h2></div>
     <div class="cards four">
       <figure>
         <div class="card"><div class="strip">Effects</div><div class="art"><span class="big">4<em>!</em></span></div></div>
@@ -344,7 +370,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   </section>
 
   <section class="chapter wrap" aria-labelledby="c6">
-    <div class="bar"><span class="num">6</span><h2 id="c6">Only have the headphone plug?</h2></div>
+    <div class="bar"><span class="num">7</span><h2 id="c6">Only have the headphone plug?</h2></div>
     <p class="lead">The cable that comes out of the FX MIC ends in a headphone-style plug. It sends sound out, like a speaker cable. FX–USB uses the USB-C port instead, so you don't need it. If you'd rather use the plug, here is what works.</p>
     <div class="cards four">
       <figure>
@@ -376,12 +402,13 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
       <div><h3>Why do I have to hold the handle?</h3><p>That's how the mic works. It only sends sound while the handle is pushed in, just like when it's plugged into a speaker.</p></div>
       <div><h3>The app says my mic needs an update.</h3><p>The mic has its own software, called firmware. FX–USB works with versions 1.1.1 and 1.1.2. The latest version and the steps to install it are on teenage engineering's website.</p></div>
       <div><h3>Do I still need batteries?</h3><p>No. The USB-C cable powers the mic while it's plugged in.</p></div>
+      <div><h3>Can the handle talk to ChatGPT or Claude?</h3><p>Yes. Set the handle to "Talk to an assistant" in the Buttons window (chapter 5) and record your assistant's talk shortcut.</p></div>
       <div><h3>Can others hear the effects?</h3><p>Yes. The effects happen inside the mic, so everyone on the call hears exactly what a speaker would play.</p></div>
     </div>
   </section>
 
   <section class="chapter wrap" id="get" aria-labelledby="c8">
-    <div class="bar"><span class="num">7</span><h2 id="c8">Get FX–USB</h2></div>
+    <div class="bar"><span class="num">8</span><h2 id="c8">Get FX–USB</h2></div>
     <div class="get-row" style="margin:0 0 22px">
       <a class="tag" href="https://github.com/danilosierrac/fx-usb/releases/latest/download/FX-USB.pkg">Download FX-USB.pkg
         <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1v10M3.5 7 8 11.5 12.5 7M2 14.5h12" stroke="currentColor" stroke-width="2" fill="none"/></svg>
@@ -403,7 +430,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     <p class="lead">To remove FX–USB again:</p>
     <pre class="cmd">sudo rm -rf /Applications/FX-USB.app /Library/Audio/Plug-Ins/HAL/FX-USB.driver &amp;&amp; sudo killall -9 coreaudiod</pre>
     <div class="spec">
-      <div><span>Version</span><b>0.2, test version</b></div>
+      <div><span>Version</span><b>0.3, test version</b></div>
       <div><span>Price</span><b>Free</b></div>
       <div><span>Mac</span><b>Apple chip, macOS 13+</b></div>
       <div><span>Mic firmware</span><b>1.1.1 or 1.1.2</b></div>

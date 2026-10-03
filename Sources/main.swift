@@ -626,6 +626,13 @@ final class AppDelegate: NSObject,NSApplicationDelegate {
     lazy var monitor = MonitorOutput(state.monitorBuffer)
     let model = MicModel()
     let popover = NSPopover()
+    let buttons = ButtonsStore()
+    lazy var engine = ButtonEngine(store:buttons,send:{ [weak self] command in self?.state.send(command) },
+                                   startVoiceNote:{ [weak self] in self?.startVoiceNote() ?? false },
+                                   stopVoiceNote:{ [weak self] in self?.stopVoiceNote() })
+    var buttonsWindow: ButtonsWindow!
+    var wasConnected = false
+    var lastNotice = "", noticeAt = Date.distantPast
     let defaults = UserDefaults.standard
     var outputs: [AudioDevice] = []
     var pressedSample: Int?
@@ -679,6 +686,8 @@ final class AppDelegate: NSObject,NSApplicationDelegate {
             self.defaults.set(device.uid,forKey:"speakersUID"); self.refresh()
         }
         model.openWindow = { [weak self] in self?.popover.performClose(nil); self?.window.show() }
+        model.openButtons = { [weak self] in self?.popover.performClose(nil); self?.buttonsWindow.show() }
+        buttonsWindow = ButtonsWindow(store:buttons)
         model.openSoundSettings = { [weak self] in self?.settings() }
         model.quit = { NSApp.terminate(nil) }
         window = MainWindow(model:model)
@@ -718,6 +727,12 @@ final class AppDelegate: NSObject,NSApplicationDelegate {
         snap.speakersDevice = speakersDevice()?.name ?? ""
         snap.outputs = outputs.map { $0.name }
         snap.pressedSample = pressedSample
+        // Mic presses → Mac actions (Buttons window).
+        if snap.connected != wasConnected { engine.connected(snap.connected); wasConnected = snap.connected }
+        if snap.connected { engine.update(snap.mic) }
+        snap.buttonsSummary = buttons.summary
+        if buttons.notice != lastNotice { lastNotice = buttons.notice; noticeAt = Date() }
+        snap.notice = Date().timeIntervalSince(noticeAt) < 4 ? buttons.notice : ""
         if let caught = monitor.guardian?.caught, caught != lastCaught { lastCaught = caught; caughtAt = Date() }
         snap.feedbackCaught = snap.speakersOn && Date().timeIntervalSince(caughtAt) < 4
         if snap != model.snapshot { model.snapshot = snap }
@@ -779,6 +794,23 @@ final class AppDelegate: NSObject,NSApplicationDelegate {
             try state.startRecording(folder.appendingPathComponent("FX–USB \(stamp.string(from:Date())).wav"))
         } catch { let alert = NSAlert(); alert.messageText = "Could not start recording"; alert.informativeText = error.localizedDescription; alert.runModal() }
         refresh()
+    }
+    /// Voice notes from a mic button: Music/FX–USB/Voice notes, one WAV per press.
+    func startVoiceNote() -> Bool {
+        state.lock.lock(); let busy = state.recording != nil; state.lock.unlock()
+        if busy { return false }
+        let folder = FileManager.default.urls(for:.musicDirectory,in:.userDomainMask)[0].appendingPathComponent("FX–USB/Voice notes")
+        let stamp = DateFormatter(); stamp.dateFormat = "yyyy-MM-dd HH.mm.ss"
+        do {
+            try FileManager.default.createDirectory(at:folder,withIntermediateDirectories:true)
+            try state.startRecording(folder.appendingPathComponent("Voice note \(stamp.string(from:Date())).wav"))
+            return true
+        } catch { return false }
+    }
+    func stopVoiceNote() -> String? {
+        state.lock.lock(); let url = state.recordingURL; state.lock.unlock()
+        state.stopRecording()
+        return url?.lastPathComponent
     }
     @objc func setup() {
         // The FX–USB installer adds the microphone; it is on the download page.
@@ -847,7 +879,8 @@ func selfTest() {
     precondition(notchOnly.rms < 0.05 && notchOnly.caught > 0,"Howl notches alone: \(notchOnly.rms) rms, \(notchOnly.caught) caught")
     precondition(open.rms > 0.2,"Room simulation must howl without the guard (\(open.rms))")
     precondition(guarded.rms < 0.02 && alarms == 0,"Feedback guard: howl \(guarded.rms) rms, \(guarded.caught) caught, \(alarms) false alarms")
-    print(String(format:"PASS: framing, hardware timeline, concealment, recording resampler, drift tracking, reader chunks, feedback guard (howl %.3f → %.4f rms; notches alone %.4f rms after %d catches; 0 false alarms)",open.rms,guarded.rms,notchOnly.rms,notchOnly.caught))
+    let buttonsCheck = buttonsSelfTest()
+    print(String(format:"PASS: framing, hardware timeline, concealment, recording resampler, drift tracking, reader chunks, feedback guard (howl %.3f → %.4f rms; notches alone %.4f rms after %d catches; 0 false alarms), %@",open.rms,guarded.rms,notchOnly.rms,notchOnly.caught,buttonsCheck))
 }
 
 func streamTest(seconds: Double, sample: Int?, pipeline: String?, loopback: String?) {

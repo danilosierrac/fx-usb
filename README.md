@@ -25,7 +25,7 @@ plug is a line output that a Mac's headphone socket ignores. FX–USB bridges th
 
 | | |
 |---|---|
-| Version | 0.2, test version: installer on the [releases page](https://github.com/danilosierrac/fx-usb/releases/latest), ad-hoc signed, not notarized |
+| Version | 0.3, test version: installer on the [releases page](https://github.com/danilosierrac/fx-usb/releases/latest), ad-hoc signed, not notarized |
 | Mac | Apple chip (M1 or newer), macOS 13 or later |
 | Mic firmware | 1.1.1 and 1.1.2 tested. Other versions are tried only if the mic's audio setup matches, and are marked untested. |
 | Audio | Measured with the factory test tone: 0 lost blocks, 0 dropouts, 40 ms buffer, also with the 3.5 mm jack in use |
@@ -75,6 +75,23 @@ have it, and call apps then list "BlackHole 2ch" instead of "FX–USB".
 The orange button changes the effect (the red light shows which), the middle button picks a sample
 (white light) and the bottom button plays it. The same buttons work on the drawing in the app.
 
+## Buttons on your Mac
+
+Give the mic's handle and buttons a job on your Mac. In the app, click **SET UP** next to BUTTONS.
+
+![The Buttons window: handle set to talk to Claude, bottom button records a voice note](site/app-buttons.png)
+
+| Job | What happens |
+|---|---|
+| Talk to an assistant | While you hold the control, FX–USB holds your assistant's talk shortcut (ChatGPT, Claude, Siri, Dictation…). **Clean voice** is on by default: the effects switch off while you talk, so the assistant hears you clearly, and come back when you let go. |
+| Record a voice note | Hold to record, let go to save a WAV in `~/Music/FX–USB/Voice notes`. |
+| Press a keyboard shortcut | One press, one shortcut. |
+| Run a Shortcut | Runs any Shortcut from the Shortcuts app. |
+
+- A button with a Mac job stops doing its mic job (next effect, next sample, play sample), unless you tick **also on the mic**. The handle always lets your voice through.
+- Pressing keys for other apps needs a one-time permission: **System Settings → Privacy & Security → Accessibility → FX–USB**. The Buttons window links there.
+- Use the push-to-talk or dictation shortcut from your assistant's own settings, then record the same keys in FX–USB.
+
 ## How it works
 
 In short: the mic's own audio engine uses about half its CPU (around 70% with the jack in), so a
@@ -92,6 +109,7 @@ What was tried, measured and changed along the way is in [docs/engineering-log.m
 |---|---|
 | `Sources/main.swift` | USB reader, packet decoder, timeline, jitter buffer, audio outputs, app delegate, test modes |
 | `Sources/UI.swift` | SwiftUI window, menu bar panel, mic drawing, menu bar and app icons |
+| `Sources/Buttons.swift` | Buttons window, key-combo recorder, and the engine that turns mic presses into Mac actions |
 | `Sources/FeedbackGuard.swift` | Frequency shifter, howl detector with notch filters, limiter, room simulation |
 | `Sources/fxmic_reader.py` | The reader uploaded to the mic's RAM (MicroPython + viper) |
 | `driver/` | Builds and installs the FX–USB virtual microphone from BlackHole v0.7.1 |
