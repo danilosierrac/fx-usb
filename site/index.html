@@ -105,6 +105,8 @@ figcaption .hint { color: var(--quiet); }
 .qa h3 { font-size: 14px; font-weight: 600; }
 .qa p { font-size: 13px; color: var(--quiet); }
 
+.cmd { margin: 0 0 22px; padding: 12px 14px; border: 1.5px solid var(--line); background: #E4E5E2; font: 500 12px/1.5 ui-monospace, "SF Mono", Menlo, monospace; text-transform: none; white-space: pre-wrap; word-break: break-all; user-select: all; }
+.get-row small a { color: inherit; }
 .spec { display: grid; grid-template-columns: repeat(4, 1fr); border: 1.5px solid var(--line); }
 .spec div { padding: 14px; border-right: 1.5px solid var(--line); display: grid; gap: 4px; }
 .spec div:last-child { border-right: 0; }
@@ -176,10 +178,10 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
       <div>
         <p>All the mic's effects come through. The app shows the mic's lights, lets you switch effects from your Mac, records with one click, and lets you hear yourself on your speakers.</p>
         <div class="get-row">
-          <a class="tag" href="#get">Download for Mac
+          <a class="tag" href="https://github.com/danilosierrac/fx-usb/releases/latest/download/FX-USB.pkg">Download for Mac
             <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1v10M3.5 7 8 11.5 12.5 7M2 14.5h12" stroke="currentColor" stroke-width="2" fill="none"/></svg>
           </a>
-          <small>Free · Macs with an Apple chip</small>
+          <small>Free · Macs with an Apple chip · <a href="#get">how to install</a></small>
         </div>
       </div>
     </div>
@@ -237,7 +239,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
       </figure>
       <figure>
         <div class="card"><div class="strip">Open FX–USB</div><div class="art"><svg id="art-app" viewBox="0 0 260 230" aria-hidden="true"></svg></div></div>
-        <figcaption>The first time, it sets up the FX–USB microphone and asks for your Mac password once. <span class="hint">After that it finds the mic by itself and says LIVE.</span></figcaption>
+        <figcaption>Install it once with FX-USB.pkg (see chapter 7), then open FX–USB from Applications. <span class="hint">It finds the mic by itself and says LIVE.</span></figcaption>
       </figure>
       <figure>
         <div class="card"><div class="strip">Pick FX–USB</div><div class="art"><svg id="art-pick" viewBox="0 0 260 230" aria-hidden="true"></svg></div></div>
@@ -380,11 +382,28 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
 
   <section class="chapter wrap" id="get" aria-labelledby="c8">
     <div class="bar"><span class="num">7</span><h2 id="c8">Get FX–USB</h2></div>
-    <p class="lead">The first ready-to-run download is being packaged. Until then you can build FX–USB yourself from the source code on GitHub, which also explains how it works.</p>
-    <p style="margin-bottom:18px"><a class="tag" href="https://github.com/danilosierrac/fx-usb">FX–USB on GitHub
-      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 13 13 3M6 3h7v7" stroke="currentColor" stroke-width="2" fill="none"/></svg></a></p>
+    <div class="get-row" style="margin:0 0 22px">
+      <a class="tag" href="https://github.com/danilosierrac/fx-usb/releases/latest/download/FX-USB.pkg">Download FX-USB.pkg
+        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1v10M3.5 7 8 11.5 12.5 7M2 14.5h12" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+      </a>
+      <small>0.5 MB · installs the app and the FX–USB microphone · <a href="https://github.com/danilosierrac/fx-usb/releases/latest">all files</a> · <a href="https://github.com/danilosierrac/fx-usb">source code</a></small>
+    </div>
+    <div class="cards four" style="margin-bottom:22px">
+      <figure><div class="card"><div class="strip">1 · Open it</div><div class="text"><p>Double-click FX-USB.pkg in your Downloads folder.</p></div></div>
+        <figcaption>macOS says it can't check the app for malicious software. <span class="hint">That's because Apple hasn't reviewed it yet, which costs a paid developer account. Click Done.</span></figcaption></figure>
+      <figure><div class="card"><div class="strip">2 · Allow it</div><div class="text"><p>System Settings → Privacy &amp; Security → scroll down → Open Anyway.</p></div></div>
+        <figcaption>Confirm with your Mac password. <span class="hint">You only do this once.</span></figcaption></figure>
+      <figure><div class="card"><div class="strip">3 · Install</div><div class="text"><p>Click through the installer.</p></div></div>
+        <figcaption>It puts FX–USB in Applications and adds the FX–USB microphone. <span class="hint">Your Mac's sound restarts for a second at the end.</span></figcaption></figure>
+      <figure><div class="card"><div class="strip">4 · Plug in and talk</div><div class="text"><p>Open FX–USB, plug in the mic and choose FX–USB in your call app.</p></div></div>
+        <figcaption>Hold the handle to talk.</figcaption></figure>
+    </div>
+    <p class="lead">Comfortable with Terminal? This one line downloads and installs it without the security prompt:</p>
+    <pre class="cmd">curl -L -o /tmp/FX-USB.pkg https://github.com/danilosierrac/fx-usb/releases/latest/download/FX-USB.pkg &amp;&amp; sudo installer -pkg /tmp/FX-USB.pkg -target /</pre>
+    <p class="lead">To remove FX–USB again:</p>
+    <pre class="cmd">sudo rm -rf /Applications/FX-USB.app /Library/Audio/Plug-Ins/HAL/FX-USB.driver &amp;&amp; sudo killall -9 coreaudiod</pre>
     <div class="spec">
-      <div><span>Version</span><b>0.2, test</b></div>
+      <div><span>Version</span><b>0.2, test version</b></div>
       <div><span>Price</span><b>Free</b></div>
       <div><span>Mac</span><b>Apple chip, macOS 13+</b></div>
       <div><span>Mic firmware</span><b>1.1.1 or 1.1.2</b></div>

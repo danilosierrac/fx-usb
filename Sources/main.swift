@@ -781,8 +781,8 @@ final class AppDelegate: NSObject,NSApplicationDelegate {
         refresh()
     }
     @objc func setup() {
-        if let url = Bundle.main.url(forResource:"BlackHole2ch-0.7.1",withExtension:"pkg") { NSWorkspace.shared.open(url) }
-        else { NSWorkspace.shared.open(URL(string:"https://existential.audio/blackhole/")!) }
+        // The FX–USB installer adds the microphone; it is on the download page.
+        NSWorkspace.shared.open(URL(string:"https://danilosierrac.github.io/fx-usb/#get")!)
     }
     @objc func settings() { NSWorkspace.shared.open(URL(string:"x-apple.systempreferences:com.apple.Sound-Settings.extension")!) }
     @objc func quit() { NSApp.terminate(nil) }

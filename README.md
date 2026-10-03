@@ -25,12 +25,31 @@ plug is a line output that a Mac's headphone socket ignores. FX–USB bridges th
 
 | | |
 |---|---|
-| Version | 0.2, test version (no signed download yet) |
+| Version | 0.2, test version: installer on the [releases page](https://github.com/danilosierrac/fx-usb/releases/latest), ad-hoc signed, not notarized |
 | Mac | Apple chip (M1 or newer), macOS 13 or later |
 | Mic firmware | 1.1.1 and 1.1.2 tested. Other versions are tried only if the mic's audio setup matches, and are marked untested. |
 | Audio | Measured with the factory test tone: 0 lost blocks, 0 dropouts, 40 ms buffer, also with the 3.5 mm jack in use |
 
-## Build and install from source
+## Download and install
+
+1. Download **[FX-USB.pkg](https://github.com/danilosierrac/fx-usb/releases/latest/download/FX-USB.pkg)** from the [latest release](https://github.com/danilosierrac/fx-usb/releases/latest).
+2. Double-click it. macOS says it can't check it for malicious software, because the app isn't notarized by Apple yet. Click **Done**.
+3. Open **System Settings → Privacy & Security**, scroll down, click **Open Anyway** and confirm with your password.
+4. Follow the installer. It puts FX–USB in Applications and adds the FX–USB microphone, then restarts Core Audio (sound drops for a second).
+
+Or in Terminal, without the prompt:
+
+```sh
+curl -L -o /tmp/FX-USB.pkg https://github.com/danilosierrac/fx-usb/releases/latest/download/FX-USB.pkg && sudo installer -pkg /tmp/FX-USB.pkg -target /
+```
+
+To uninstall:
+
+```sh
+sudo rm -rf /Applications/FX-USB.app /Library/Audio/Plug-Ins/HAL/FX-USB.driver && sudo killall -9 coreaudiod
+```
+
+## Build from source
 
 You need Xcode (for the microphone driver) and its command line tools.
 
@@ -76,6 +95,7 @@ What was tried, measured and changed along the way is in [docs/engineering-log.m
 | `Sources/FeedbackGuard.swift` | Frequency shifter, howl detector with notch filters, limiter, room simulation |
 | `Sources/fxmic_reader.py` | The reader uploaded to the mic's RAM (MicroPython + viper) |
 | `driver/` | Builds and installs the FX–USB virtual microphone from BlackHole v0.7.1 |
+| `release/` | `make-release.sh` builds `FX-USB.pkg` (app + microphone driver) and `FX-USB.zip` |
 | `site/` | The guide page. `site/publish.sh` builds it and publishes it to the `gh-pages` branch for GitHub Pages; `site/make-og.sh` renders the social sharing card (`og-image.png`) |
 | `tools/` | Python diagnostics: device queries and reader comparisons |
 
